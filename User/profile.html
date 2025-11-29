@@ -528,64 +528,45 @@
             }
 
             try {
-                // Update in Firebase
-                // Assuming users are stored by mobile number or we need to find the user key
-                // Since we don't have the user key in session, we might need to search or assume structure
-                // For this implementation, we'll update based on the assumption that we can find the user
-                // or just update the session for now if we can't write to DB easily without Auth ID.
-                
-                // However, looking at signup, users are stored under 'users' node.
-                // We need to find the user entry.
-                
-                const usersRef = ref(database, 'users');
-                const snapshot = await get(usersRef);
+                // Update in Firebase directly using mobile number as key
+                const userRef = ref(database, 'users/' + currentUserData.mobile);
+                const snapshot = await get(userRef);
                 
                 if (snapshot.exists()) {
-                    const users = snapshot.val();
-                    let userKey = null;
+                    const updates = {
+                        username: newName,
+                        vehicleNo: newVehicleNo,
+                        vehicleModel: newVehicleModel
+                    };
                     
-                    Object.keys(users).forEach(key => {
-                        if (users[key].mobile === currentUserData.mobile) {
-                            userKey = key;
-                        }
-                    });
-
-                    if (userKey) {
-                        const updates = {
-                            username: newName,
-                            vehicleNo: newVehicleNo,
-                            vehicleModel: newVehicleModel
-                        };
-                        
-                        await update(ref(database, `users/${userKey}`), updates);
-                        
-                        // Update Session
-                        currentUserData.username = newName;
-                        currentUserData.vehicleNo = newVehicleNo;
-                        currentUserData.vehicleModel = newVehicleModel; // Add model to session
-                        sessionStorage.setItem('loggedInUser', JSON.stringify(currentUserData));
-                        
-                        // Update UI
-                        document.getElementById('userName').textContent = newName;
-                        document.getElementById('profileName').textContent = newName;
-                        document.getElementById('userAvatar').textContent = newName.charAt(0).toUpperCase();
-                        document.getElementById('profileAvatarLarge').textContent = newName.charAt(0).toUpperCase();
-                        
-                        alert('Profile updated successfully!');
-                        
-                        // Reset UI state
-                        const inputs = document.querySelectorAll('.form-control');
-                        inputs.forEach(input => input.disabled = true);
-                        
-                        const editBtn = document.getElementById('editBtn');
-                        editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit Profile';
-                        editBtn.style.backgroundColor = ''; // Reset to default
-                        editBtn.classList.remove('btn-success');
-                        editBtn.classList.add('btn-primary');
-                        isEditing = false;
-                    } else {
-                        alert('User record not found in database.');
-                    }
+                    await update(userRef, updates);
+                    
+                    // Update Session
+                    currentUserData.username = newName;
+                    currentUserData.vehicleNo = newVehicleNo;
+                    currentUserData.vehicleModel = newVehicleModel;
+                    sessionStorage.setItem('loggedInUser', JSON.stringify(currentUserData));
+                    
+                    // Update UI
+                    document.getElementById('userName').textContent = newName;
+                    document.getElementById('profileName').textContent = newName;
+                    document.getElementById('userAvatar').textContent = newName.charAt(0).toUpperCase();
+                    document.getElementById('profileAvatarLarge').textContent = newName.charAt(0).toUpperCase();
+                    
+                    alert('Profile updated successfully!');
+                    
+                    // Reset UI state
+                    const inputs = document.querySelectorAll('.form-control');
+                    inputs.forEach(input => input.disabled = true);
+                    
+                    const editBtn = document.getElementById('editBtn');
+                    editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit Profile';
+                    editBtn.style.backgroundColor = ''; // Reset to default
+                    editBtn.classList.remove('btn-success');
+                    editBtn.classList.add('btn-primary');
+                    isEditing = false;
+                } else {
+                    alert('User record not found in database.');
                 }
             } catch (error) {
                 console.error("Error updating profile:", error);

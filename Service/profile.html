@@ -551,60 +551,49 @@
                 // Parse service types
                 const newServiceTypes = newServiceTypesStr.split(',').map(s => s.trim()).filter(s => s.length > 0);
 
-                // Find provider in DB
-                const providersRef = ref(database, 'serviceProviders');
-                const snapshot = await get(providersRef);
+                // Find provider in DB directly using mobile number
+                const providerRef = ref(database, 'serviceProviders/' + currentProviderData.mobile);
+                const snapshot = await get(providerRef);
                 
                 if (snapshot.exists()) {
-                    const providers = snapshot.val();
-                    let providerKey = null;
+                    const updates = {
+                        shopName: newShopName,
+                        ownerName: newOwnerName,
+                        placeName: newLocation, // Assuming placeName is used for location display
+                        serviceTypes: newServiceTypes
+                    };
                     
-                    Object.keys(providers).forEach(key => {
-                        if (providers[key].mobile === currentProviderData.mobile) {
-                            providerKey = key;
-                        }
-                    });
-
-                    if (providerKey) {
-                        const updates = {
-                            shopName: newShopName,
-                            ownerName: newOwnerName,
-                            placeName: newLocation, // Assuming placeName is used for location display
-                            serviceTypes: newServiceTypes
-                        };
-                        
-                        await update(ref(database, `serviceProviders/${providerKey}`), updates);
-                        
-                        // Update Session
-                        currentProviderData.shopName = newShopName;
-                        currentProviderData.ownerName = newOwnerName;
-                        currentProviderData.placeName = newLocation;
-                        currentProviderData.location = newLocation; // Update both just in case
-                        currentProviderData.serviceTypes = newServiceTypes;
-                        
-                        sessionStorage.setItem('loggedInServiceProvider', JSON.stringify(currentProviderData));
-                        
-                        // Update UI
-                        document.getElementById('userName').textContent = newShopName;
-                        document.getElementById('profileName').textContent = newShopName;
-                        document.getElementById('userAvatar').textContent = newShopName.charAt(0).toUpperCase();
-                        document.getElementById('profileAvatarLarge').textContent = newShopName.charAt(0).toUpperCase();
-                        
-                        alert('Profile updated successfully!');
-                        
-                        // Reset UI state
-                        const inputs = document.querySelectorAll('.form-control');
-                        inputs.forEach(input => input.disabled = true);
-                        
-                        const editBtn = document.getElementById('editBtn');
-                        editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit Profile';
-                        editBtn.style.backgroundColor = ''; // Reset to default
-                        editBtn.classList.remove('btn-success');
-                        editBtn.classList.add('btn-primary');
-                        isEditing = false;
-                    } else {
-                        alert('Provider record not found in database.');
-                    }
+                    await update(providerRef, updates);
+                    
+                    // Update Session
+                    currentProviderData.shopName = newShopName;
+                    currentProviderData.ownerName = newOwnerName;
+                    currentProviderData.placeName = newLocation;
+                    currentProviderData.location = newLocation; // Update both just in case
+                    currentProviderData.serviceTypes = newServiceTypes;
+                    
+                    sessionStorage.setItem('loggedInServiceProvider', JSON.stringify(currentProviderData));
+                    
+                    // Update UI
+                    document.getElementById('userName').textContent = newShopName;
+                    document.getElementById('profileName').textContent = newShopName;
+                    document.getElementById('userAvatar').textContent = newShopName.charAt(0).toUpperCase();
+                    document.getElementById('profileAvatarLarge').textContent = newShopName.charAt(0).toUpperCase();
+                    
+                    alert('Profile updated successfully!');
+                    
+                    // Reset UI state
+                    const inputs = document.querySelectorAll('.form-control');
+                    inputs.forEach(input => input.disabled = true);
+                    
+                    const editBtn = document.getElementById('editBtn');
+                    editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit Profile';
+                    editBtn.style.backgroundColor = ''; // Reset to default
+                    editBtn.classList.remove('btn-success');
+                    editBtn.classList.add('btn-primary');
+                    isEditing = false;
+                } else {
+                    alert('Provider record not found in database.');
                 }
             } catch (error) {
                 console.error("Error updating profile:", error);
