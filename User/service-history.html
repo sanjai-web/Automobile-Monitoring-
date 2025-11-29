@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service History - Vehicle Service Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --secondary: #818CF8;
+            --background: #F3F4F6;
+            --surface: #FFFFFF;
+            --text-main: #1F2937;
+            --text-light: #6B7280;
+            --border: #E5E7EB;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --info: #3B82F6;
+            --sidebar-width: 260px;
+            --header-height: 64px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100%;
+            z-index: 50;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 1rem;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: #EEF2FF;
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            width: 1.25rem;
+            text-align: center;
+        }
+
+        .user-profile {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Header */
+        header {
+            height: var(--header-height);
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--background);
+            border-color: var(--text-light);
+        }
+
+        /* Content Area */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        /* History List */
+        .history-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .booking-card {
+            background-color: var(--surface);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .booking-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .booking-info h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .booking-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .booking-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending { background-color: #FFFBEB; color: var(--warning); }
+        .status-accepted { background-color: #EFF6FF; color: var(--info); }
+        .status-in-progress { background-color: #E0F2FE; color: #0369A1; }
+        .status-completed { background-color: #ECFDF5; color: var(--success); }
+        .status-cancelled { background-color: #FEF2F2; color: var(--danger); }
+
+        .booking-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .detail-item label {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .detail-item span {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .cost-value {
+            color: var(--success) !important;
+            font-weight: 600 !important;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .header-title {
+                display: none;
+            }
+            
+            .content-scroll {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="dashboard.html" class="logo">
+                <i class="fas fa-car-side"></i>
+                VehiclePro
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-item" onclick="window.location.href='dashboard.html'">
+                <i class="fas fa-th-large"></i>
+                Dashboard
+            </div>
+            <div class="nav-item" onclick="window.location.href='vehicle-health.html'">
+                <i class="fas fa-heartbeat"></i>
+                Vehicle Health
+            </div>
+            <div class="nav-item active">
+                <i class="fas fa-history"></i>
+                Service History
+            </div>
+            <div class="nav-item" onclick="window.location.href='profile.html'">
+                <i class="fas fa-user-cog"></i>
+                Profile Settings
+            </div>
+        </nav>
+        <div class="user-profile">
+            <div class="avatar" id="userAvatar">U</div>
+            <div class="user-info">
+                <div class="user-name" id="userName">User</div>
+                <div class="user-role">Vehicle Owner</div>
+            </div>
+            <button class="btn-outline" onclick="logout()" style="border: none; padding: 0.5rem;">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header>
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="header-title">Service History</div>
+            <div class="header-actions">
+                <button class="btn btn-outline" onclick="window.location.href='dashboard.html'">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </button>
+            </div>
+        </header>
+
+        <div class="content-scroll">
+            <div class="history-container" id="historyContainer">
+                <!-- Bookings will be populated here -->
+                <div class="empty-state">
+                    <p>Loading service history...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyASqz3ZFzKeJfZEPpNR2xNTFaN2xIAIo40",
+            authDomain: "vehicle-monitoring-9551e.firebaseapp.com",
+            databaseURL: "https://vehicle-monitoring-9551e-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "vehicle-monitoring-9551e",
+            storageBucket: "vehicle-monitoring-9551e.firebasestorage.app",
+            messagingSenderId: "321619066021",
+            appId: "1:321619066021:web:e7dd6e12882ab0467b214c",
+            measurementId: "G-V4EXKXP290"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Global variables
+        let userBookings = [];
+
+        // Sidebar Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target) && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
+        // Check if user is logged in
+        window.addEventListener('DOMContentLoaded', () => {
+            const userSession = sessionStorage.getItem('loggedInUser');
+            
+            if (!userSession) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const userData = JSON.parse(userSession);
+            
+            // Update UI with user data
+            document.getElementById('userName').textContent = userData.username;
+            document.getElementById('userAvatar').textContent = userData.username.charAt(0).toUpperCase();
+
+            // Load user bookings
+            loadUserBookings(userData.mobile);
+        });
+
+        // Load user bookings from database
+        function loadUserBookings(userMobile) {
+            const bookingsRef = ref(database, 'bookings');
+            onValue(bookingsRef, (snapshot) => {
+                userBookings = [];
+                const data = snapshot.val();
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        const booking = data[key];
+                        if (booking.ownerMobile === userMobile) {
+                            userBookings.push({
+                                id: key,
+                                ...booking
+                            });
+                        }
+                    });
+                    renderHistory();
+                } else {
+                    renderHistory(); // Render empty state
+                }
+            });
+        }
+
+        // Render history in the UI
+        function renderHistory() {
+            const container = document.getElementById('historyContainer');
+            
+            if (userBookings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-history" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p>You haven't booked any services yet.</p>
+                        <button class="btn btn-primary" onclick="window.location.href='dashboard.html'" style="margin-top: 1rem;">
+                            Book Your First Service
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort bookings by date (newest first)
+            userBookings.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            container.innerHTML = userBookings.map(booking => `
+                <div class="booking-card">
+                    <div class="booking-header">
+                        <div class="booking-info">
+                            <h3>${booking.serviceType}</h3>
+                            <div class="booking-meta">
+                                <span><i class="far fa-calendar"></i> ${formatDate(booking.timestamp)}</span>
+                                <span><i class="fas fa-map-marker-alt"></i> ${booking.shopName}</span>
+                            </div>
+                        </div>
+                        <div class="status-badge status-${booking.status}">${booking.status}</div>
+                    </div>
+                    <div class="booking-details-grid">
+                        <div class="detail-item">
+                            <label>Service Center</label>
+                            <span>${booking.shopName}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Vehicle</label>
+                            <span>${booking.vehicleModel} (${booking.vehicleNumber})</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Location</label>
+                            <span>${booking.location}</span>
+                        </div>
+                        ${booking.finalCost ? `
+                        <div class="detail-item">
+                            <label>Service Cost</label>
+                            <span class="cost-value">${booking.finalCost}</span>
+                        </div>
+                        ` : ''}
+                        ${booking.statusNotes ? `
+                        <div class="detail-item" style="grid-column: 1 / -1;">
+                            <label>Provider Notes</label>
+                            <span>${booking.statusNotes}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    ${booking.status === 'pending' ? `
+                    <div style="display: flex; justify-content: flex-end; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border);">
+                        <button class="btn btn-outline" onclick="cancelBooking('${booking.id}')" style="color: var(--danger); border-color: var(--danger);">
+                            <i class="fas fa-times"></i> Cancel Booking
+                        </button>
+                    </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Cancel booking function
+        window.cancelBooking = async function(bookingId) {
+            if (confirm('Are you sure you want to cancel this booking?')) {
+                try {
+                    const bookingRef = ref(database, 'bookings/' + bookingId);
+                    await update(bookingRef, {
+                        status: 'cancelled',
+                        cancelledAt: new Date().toISOString(),
+                        cancelledBy: 'user'
+                    });
+                    alert('Booking cancelled successfully.');
+                } catch (error) {
+                    alert('Error cancelling booking: ' + error.message);
+                }
+            }
+        }
+
+        window.logout = function() {
+            sessionStorage.removeItem('loggedInUser');
+            window.location.href = '../index.html';
+        }
+    </script>
+</body>
+</html>

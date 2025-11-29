@@ -3,9 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vehicle Service Pro - User Dashboard</title>
+    <title>User Dashboard - Vehicle Service Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --secondary: #818CF8;
+            --background: #F3F4F6;
+            --surface: #FFFFFF;
+            --text-main: #1F2937;
+            --text-light: #6B7280;
+            --border: #E5E7EB;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --info: #3B82F6;
+            --sidebar-width: 260px;
+            --header-height: 64px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,338 +36,408 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
         }
 
-        /* Navigation Bar */
-        nav {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 1.5rem 2rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--surface);
+            border-right: 1px solid var(--border);
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            position: fixed;
+            height: 100%;
+            z-index: 50;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            height: var(--header-height);
+            display: flex;
             align-items: center;
+            padding: 0 1.5rem;
+            border-bottom: 1px solid var(--border);
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: white;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
         }
 
-        .logo svg {
-            width: 35px;
-            height: 35px;
+        .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 1rem;
+            overflow-y: auto;
         }
 
-        .nav-right {
+        .nav-item {
             display: flex;
             align-items: center;
-            gap: 2rem;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+            font-weight: 500;
+            cursor: pointer;
         }
 
-        .user-info {
+        .nav-item:hover, .nav-item.active {
+            background-color: #EEF2FF;
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            width: 1.25rem;
+            text-align: center;
+        }
+
+        .user-profile {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
             display: flex;
             align-items: center;
-            gap: 1rem;
-            color: white;
+            gap: 0.75rem;
         }
 
-        .user-avatar {
-            width: 40px;
-            height: 40px;
+        .avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            background-color: var(--primary);
+            color: white;
             border-radius: 50%;
-            background: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #667eea;
-            font-weight: bold;
-            font-size: 1.2rem;
+            font-weight: 600;
         }
 
-        .nav-buttons {
+        .user-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Header */
+        header {
+            height: var(--header-height);
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
             display: flex;
             gap: 1rem;
         }
 
-        .nav-btn {
-            padding: 0.6rem 1.5rem;
-            background: white;
-            color: #667eea;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .nav-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
         }
 
-        /* Main Content */
-        .dashboard-container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 2rem;
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
         }
 
-        .welcome-section {
-            background: white;
-            border-radius: 15px;
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--background);
+            border-color: var(--text-light);
+        }
+
+        /* Dashboard Content */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
             padding: 2rem;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 1rem;
+            padding: 2rem;
+            color: white;
             margin-bottom: 2rem;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            animation: fadeIn 0.5s ease-out;
+            box-shadow: var(--shadow-md);
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .welcome-section h1 {
-            color: #333;
-            font-size: 2rem;
+        .welcome-banner h1 {
+            font-size: 1.75rem;
             margin-bottom: 0.5rem;
         }
 
-        .welcome-section p {
-            color: #666;
-            font-size: 1.1rem;
+        .welcome-banner p {
+            opacity: 0.9;
         }
 
-        /* Dashboard Grid */
-        .dashboard-grid {
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
-        .dashboard-card {
-            background: white;
-            border-radius: 15px;
+        .stat-card {
+            background-color: var(--surface);
             padding: 1.5rem;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-            animation: fadeIn 0.5s ease-out;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
         }
 
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        .stat-info h3 {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
         }
 
-        .card-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .stat-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.75rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1rem;
+            font-size: 1.25rem;
         }
 
-        .card-icon.purple {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
+        .bg-indigo { background-color: #EEF2FF; color: var(--primary); }
+        .bg-green { background-color: #ECFDF5; color: var(--success); }
+        .bg-orange { background-color: #FFFBEB; color: var(--warning); }
 
-        .card-icon.green {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        }
-
-        .card-icon.orange {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .card-icon.blue {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
-
-        .card-icon svg {
-            width: 28px;
-            height: 28px;
-            color: white;
-        }
-
-        .card-title {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .card-value {
-            color: #333;
-            font-size: 1.8rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
-        .card-subtitle {
-            color: #999;
-            font-size: 0.85rem;
-        }
-
-        /* Services Section */
-        .services-section {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            animation: fadeIn 0.5s ease-out;
-        }
-
+        /* Section Headers */
         .section-header {
-            text-align: center;
-            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
         }
 
         .section-header h2 {
-            color: #333;
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
         }
 
-        .section-header p {
-            color: #666;
-            font-size: 1rem;
-        }
-
+        /* Services Grid */
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
         }
 
         .service-card {
-            background: #f8f9fa;
-            border-radius: 12px;
+            background-color: var(--surface);
+            border-radius: 1rem;
             padding: 1.5rem;
-            transition: all 0.3s;
-            border-left: 4px solid #667eea;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             text-align: center;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
             cursor: pointer;
         }
 
         .service-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            background: white;
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
         }
 
         .service-icon {
-            width: 80px;
-            height: 80px;
+            width: 4rem;
+            height: 4rem;
+            background-color: #EEF2FF;
+            color: var(--primary);
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.5rem;
-            color: white;
-            font-size: 2rem;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
         }
 
         .service-card h3 {
-            color: #333;
-            font-size: 1.3rem;
-            margin-bottom: 0.8rem;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
         }
 
         .service-card p {
-            color: #666;
-            line-height: 1.6;
+            font-size: 0.875rem;
+            color: var(--text-light);
         }
 
-        /* User Details Section */
-        .user-details {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            animation: fadeIn 0.5s ease-out;
+        /* Bookings List */
+        .bookings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
 
-        .user-details h2 {
-            color: #333;
-            margin-bottom: 1.5rem;
-            font-size: 1.5rem;
+        .booking-card {
+            background-color: var(--surface);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
 
-        .detail-row {
+        .booking-header {
             display: flex;
             justify-content: space-between;
-            padding: 1rem 0;
-            border-bottom: 1px solid #f0f0f0;
+            align-items: flex-start;
         }
 
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-
-        .detail-label {
-            color: #666;
-            font-weight: 500;
-        }
-
-        .detail-value {
-            color: #333;
+        .booking-info h3 {
+            font-size: 1.125rem;
             font-weight: 600;
+            margin-bottom: 0.25rem;
         }
 
-        /* Quick Actions */
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .action-btn {
-            padding: 1rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
+        .booking-meta {
+            font-size: 0.875rem;
+            color: var(--text-light);
             display: flex;
+            gap: 1rem;
             align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
         }
 
-        .action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
-        .action-btn svg {
-            width: 20px;
-            height: 20px;
+        .status-pending { background-color: #FFFBEB; color: var(--warning); }
+        .status-accepted { background-color: #EFF6FF; color: var(--info); }
+        .status-completed { background-color: #ECFDF5; color: var(--success); }
+
+        .booking-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
         }
 
-        /* Modal Styles */
+        .detail-item label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-item span {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .cost-value {
+            color: var(--primary) !important;
+            font-weight: 700 !important;
+            font-size: 1.1rem !important;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background-color: var(--surface);
+            border-radius: 1rem;
+            border: 1px dashed var(--border);
+        }
+
+        .empty-state p {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -352,434 +445,251 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 100;
             justify-content: center;
             align-items: center;
+            padding: 1rem;
         }
 
         .modal-content {
-            background: white;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 600px;
+            background-color: var(--surface);
+            width: 100%;
+            max-width: 500px;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-lg);
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            animation: modalFadeIn 0.3s ease-out;
+            animation: slideUp 0.3s ease-out;
         }
 
-        @keyframes modalFadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid #f0f0f0;
         }
 
         .modal-header h2 {
-            color: #333;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
         }
 
         .close-btn {
             background: none;
             border: none;
             font-size: 1.5rem;
+            color: var(--text-light);
             cursor: pointer;
-            color: #666;
-            transition: color 0.3s;
-        }
-
-        .close-btn:hover {
-            color: #333;
         }
 
         .modal-body {
-            padding: 2rem;
+            padding: 1.5rem;
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #333;
+            font-size: 0.9rem;
             font-weight: 500;
         }
 
         .form-control {
             width: 100%;
-            padding: 0.8rem 1rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-            outline: none;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
         }
 
         .form-control:focus {
-            border-color: #667eea;
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
 
-        .submit-btn {
+        .btn-block {
             width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 1rem;
+            justify-content: center;
+            padding: 0.75rem;
         }
 
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        /* Bookings Section */
-        .bookings-section {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .booking-card {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border-left: 4px solid #667eea;
-            transition: all 0.3s;
-        }
-
-        .booking-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .booking-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .booking-title {
-            font-size: 1.2rem;
-            color: #333;
-            font-weight: 600;
-        }
-
-        .booking-status {
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .status-pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-accepted {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        .status-completed {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .booking-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .booking-detail {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .detail-label {
-            color: #666;
-            font-size: 0.8rem;
-            margin-bottom: 0.3rem;
-        }
-
-        .detail-value {
-            color: #333;
-            font-weight: 500;
-        }
-
-        /* Responsive Design */
+        /* Responsive */
         @media (max-width: 768px) {
-            nav {
-                padding: 1rem;
+            .sidebar {
+                transform: translateX(-100%);
             }
 
-            .logo {
-                font-size: 1.2rem;
+            .sidebar.active {
+                transform: translateX(0);
             }
 
-            .nav-right {
-                gap: 1rem;
+            .main-content {
+                margin-left: 0;
             }
 
-            .user-info span {
+            .menu-toggle {
+                display: block;
+            }
+
+            .header-title {
                 display: none;
             }
-
-            .dashboard-container {
-                padding: 0 1rem;
+            
+            .content-scroll {
+                padding: 1rem;
             }
-
-            .welcome-section h1 {
-                font-size: 1.5rem;
-            }
-
-            .dashboard-grid {
+            
+            .stats-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .services-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .booking-details {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .detail-row {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            .quick-actions {
-                grid-template-columns: 1fr;
-            }
-
-            .nav-buttons {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            .modal-content {
-                width: 95%;
-            }
-
-            .modal-body {
-                padding: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav>
-        <div class="logo">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
-            </svg>
-            Vehicle Service Pro
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="logo">
+                <i class="fas fa-car-side"></i>
+                VehiclePro
+            </a>
         </div>
-        <div class="nav-right">
+        <nav class="sidebar-nav">
+            <div class="nav-item active">
+                <i class="fas fa-th-large"></i>
+                Dashboard
+            </div>
+            <div class="nav-item" onclick="viewVehicleHealth()">
+                <i class="fas fa-heartbeat"></i>
+                Vehicle Health
+            </div>
+            <div class="nav-item" onclick="viewHistory()">
+                <i class="fas fa-history"></i>
+                Service History
+            </div>
+            <div class="nav-item" onclick="window.location.href='profile.html'">
+                <i class="fas fa-user-cog"></i>
+                Profile Settings
+            </div>
+        </nav>
+        <div class="user-profile">
+            <div class="avatar" id="userAvatar">U</div>
             <div class="user-info">
-                <div class="user-avatar" id="userAvatar">U</div>
-                <span id="userName">User</span>
+                <div class="user-name" id="userName">User</div>
+                <div class="user-role">Vehicle Owner</div>
             </div>
-            <div class="nav-buttons">
-                <button class="nav-btn" onclick="viewVehicleHealth()">Vehicle Health</button>
-                <button class="nav-btn" onclick="logout()">Logout</button>
-            </div>
+            <button class="btn-outline" onclick="logout()" style="border: none; padding: 0.5rem;">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
         </div>
-    </nav>
+    </aside>
 
     <!-- Main Content -->
-    <div class="dashboard-container">
-        <!-- Welcome Section -->
-        <div class="welcome-section">
-            <h1>Welcome back, <span id="welcomeName">User</span>!</h1>
-            <p>Here's an overview of your vehicle service account</p>
-        </div>
+    <main class="main-content">
+        <header>
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="header-title">Dashboard</div>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="openBookingModal()">
+                    <i class="fas fa-plus"></i>
+                    <span style="display: none;">Book Service</span>
+                </button>
+            </div>
+        </header>
 
-        <!-- Dashboard Cards -->
-        <div class="dashboard-grid">
-            <div class="dashboard-card">
-                <div class="card-icon purple">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                    </svg>
-                </div>
-                <div class="card-title">Total Services</div>
-                <div class="card-value" id="totalServices">0</div>
-                <div class="card-subtitle">Lifetime services completed</div>
+        <div class="content-scroll">
+            <div class="welcome-banner">
+                <h1>Welcome back, <span id="welcomeName">User</span>!</h1>
+                <p>Track your vehicle services and maintenance schedule.</p>
             </div>
 
-            <div class="dashboard-card">
-                <div class="card-icon green">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                    </svg>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Total Services</h3>
+                        <div class="stat-value" id="totalServices">0</div>
+                    </div>
+                    <div class="stat-icon bg-indigo">
+                        <i class="fas fa-wrench"></i>
+                    </div>
                 </div>
-                <div class="card-title">Service Centers</div>
-                <div class="card-value">15+</div>
-                <div class="card-subtitle">Available in your area</div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Next Service</h3>
+                        <div class="stat-value" style="font-size: 1.25rem;" id="nextServiceDate">--</div>
+                        <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.25rem;" id="nextServiceText">No upcoming services</div>
+                    </div>
+                    <div class="stat-icon bg-orange">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                </div>
             </div>
 
-            <div class="dashboard-card">
-                <div class="card-icon orange">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
-                    </svg>
-                </div>
-                <div class="card-title">Next Service</div>
-                <div class="card-value" id="nextServiceDate">--</div>
-                <div class="card-subtitle" id="nextServiceText">Schedule your first service</div>
-            </div>
-        </div>
-
-        <!-- Bookings Section -->
-        <div class="bookings-section">
             <div class="section-header">
-                <h2>Your Service Bookings</h2>
-                <p>Track the status of your vehicle service requests</p>
+                <h2>Quick Book Service</h2>
             </div>
-            <div id="bookingsContainer">
-                <!-- Bookings will be dynamically inserted here -->
-                <div class="empty-state" id="emptyBookings">
-                    <p>You haven't booked any services yet.</p>
-                    <button class="action-btn" onclick="openBookingModal()" style="margin-top: 1rem;">
-                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                        </svg>
-                        Book Your First Service
-                    </button>
-                </div>
-            </div>
-        </div>
 
-        <!-- Services Section -->
-        <div class="services-section">
-            <div class="section-header">
-                <h2>Book Services</h2>
-                <p>Select a service to book or use the booking form</p>
-            </div>
             <div class="services-grid">
                 <div class="service-card" onclick="openBookingModal('Oil Change')">
                     <div class="service-icon">
                         <i class="fas fa-oil-can"></i>
                     </div>
                     <h3>Oil Change</h3>
-                    <p>Keep your engine running smoothly with a quick and efficient oil change service.</p>
+                    <p>Premium oil and filter replacement.</p>
                 </div>
-                <div class="service-card" onclick="openBookingModal('ABS Brakes')">
+                <div class="service-card" onclick="openBookingModal('General Maintenance')">
                     <div class="service-icon">
-                        <i class="fas fa-car-crash"></i>
+                        <i class="fas fa-tools"></i>
                     </div>
-                    <h3>ABS Brakes</h3>
-                    <p>Ensure your vehicle's safety with professional ABS brake inspection and repair.</p>
-                </div>
-                <div class="service-card" onclick="openBookingModal('Transmission')">
-                    <div class="service-icon">
-                        <i class="fas fa-cogs"></i>
-                    </div>
-                    <h3>Transmission</h3>
-                    <p>Get expert transmission checkups and repairs for smooth gear shifting and performance.</p>
+                    <h3>General Maintenance</h3>
+                    <p>Complete vehicle checkup.</p>
                 </div>
                 <div class="service-card" onclick="openBookingModal('Tires & Wheels')">
                     <div class="service-icon">
                         <i class="fas fa-tire"></i>
                     </div>
                     <h3>Tires & Wheels</h3>
-                    <p>Improve stability and safety with tire replacement, alignment, and wheel balancing.</p>
+                    <p>Rotation, alignment, and repair.</p>
                 </div>
                 <div class="service-card" onclick="openBookingModal('Engine Tuning')">
                     <div class="service-icon">
-                        <i class="fas fa-tachometer-alt"></i>
+                        <i class="fas fa-cogs"></i>
                     </div>
                     <h3>Engine Tuning</h3>
-                    <p>Boost performance and fuel efficiency with precise engine diagnostics and tuning.</p>
+                    <p>Performance optimization.</p>
                 </div>
-                <div class="service-card" onclick="openBookingModal('General Maintenance')">
-                    <div class="service-icon">
-                        <i class="fas fa-toolbox"></i>
-                    </div>
-                    <h3>General Maintenance</h3>
-                    <p>Comprehensive vehicle checkup and maintenance to keep your car in top condition.</p>
+            </div>
+
+            <div class="section-header">
+                <h2>Recent Bookings</h2>
+                <button class="btn btn-outline" onclick="viewHistory()">View All</button>
+            </div>
+
+            <div class="bookings-list" id="bookingsContainer">
+                <!-- Bookings will be populated here -->
+                <div class="empty-state" id="emptyBookings">
+                    <p>You haven't booked any services yet.</p>
+                    <button class="btn btn-primary" onclick="openBookingModal()">Book Your First Service</button>
                 </div>
             </div>
         </div>
-
-        <!-- User Details -->
-        <div class="user-details">
-            <h2>Account Information</h2>
-            <div class="detail-row">
-                <span class="detail-label">Username</span>
-                <span class="detail-value" id="detailUsername">--</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Mobile Number</span>
-                <span class="detail-value" id="detailMobile">--</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Vehicle Number</span>
-                <span class="detail-value" id="detailVehicle">--</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Member Since</span>
-                <span class="detail-value" id="detailMemberSince">Today</span>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-                <button class="action-btn" onclick="openBookingModal()">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
-                    </svg>
-                    Book Service
-                </button>
-                <button class="action-btn" onclick="viewHistory()">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
-                    </svg>
-                    Service History
-                </button>
-                <button class="action-btn" onclick="editProfile()">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-                    </svg>
-                    Edit Profile
-                </button>
-            </div>
-        </div>
-    </div>
+    </main>
 
     <!-- Booking Modal -->
     <div class="modal" id="bookingModal">
@@ -798,14 +708,11 @@
                         <label for="vehicleModel">Vehicle Model</label>
                         <input type="text" id="vehicleModel" class="form-control" placeholder="e.g. Toyota Camry" required>
                     </div>
-                    <div class="form-group">
-                        <label for="ownerName">Owner Name</label>
-                        <input type="text" id="ownerName" class="form-control" placeholder="Your full name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="ownerMobile">Owner Mobile</label>
-                        <input type="tel" id="ownerMobile" class="form-control" placeholder="10-digit mobile number" pattern="[0-9]{10}" maxlength="10" required>
-                    </div>
+                    
+                    <!-- Hidden fields for owner info -->
+                    <input type="hidden" id="ownerName">
+                    <input type="hidden" id="ownerMobile">
+
                     <div class="form-group">
                         <label for="serviceType">Service Type</label>
                         <select id="serviceType" class="form-control" required>
@@ -826,13 +733,13 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="shopName">Shop Name</label>
+                        <label for="shopName">Service Center</label>
                         <select id="shopName" class="form-control" required>
                             <option value="">Select a shop</option>
                             <!-- Shop names will be populated dynamically based on location -->
                         </select>
                     </div>
-                    <button type="submit" class="submit-btn">Submit Booking</button>
+                    <button type="submit" class="btn btn-primary btn-block">Confirm Booking</button>
                 </form>
             </div>
         </div>
@@ -861,6 +768,24 @@
         let serviceProviders = [];
         let userBookings = [];
 
+        // Sidebar Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.querySelector('.main-content');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target) && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
         // Check if user is logged in
         window.addEventListener('DOMContentLoaded', () => {
             const userSession = sessionStorage.getItem('loggedInUser');
@@ -876,10 +801,6 @@
             document.getElementById('userName').textContent = userData.username;
             document.getElementById('welcomeName').textContent = userData.username;
             document.getElementById('userAvatar').textContent = userData.username.charAt(0).toUpperCase();
-            
-            document.getElementById('detailUsername').textContent = userData.username;
-            document.getElementById('detailMobile').textContent = userData.mobile;
-            document.getElementById('detailVehicle').textContent = userData.vehicleNo;
 
             // Pre-fill booking form with user data
             document.getElementById('ownerName').value = userData.username;
@@ -924,7 +845,7 @@
         }
 
         // Update shop names based on selected location
-        function updateShopNames() {
+        window.updateShopNames = function() {
             const location = document.getElementById('location').value;
             const shopSelect = document.getElementById('shopName');
             shopSelect.innerHTML = '<option value="">Select a shop</option>';
@@ -966,18 +887,12 @@
         // Render user bookings in the UI
         function renderUserBookings() {
             const container = document.getElementById('bookingsContainer');
-            const emptyState = document.getElementById('emptyBookings');
             
             if (userBookings.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state" id="emptyBookings">
                         <p>You haven't booked any services yet.</p>
-                        <button class="action-btn" onclick="openBookingModal()" style="margin-top: 1rem;">
-                            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                            </svg>
-                            Book Your First Service
-                        </button>
+                        <button class="btn btn-primary" onclick="openBookingModal()">Book Your First Service</button>
                     </div>
                 `;
                 return;
@@ -989,30 +904,38 @@
             container.innerHTML = userBookings.map(booking => `
                 <div class="booking-card">
                     <div class="booking-header">
-                        <div class="booking-title">${booking.serviceType}</div>
-                        <div class="booking-status status-${booking.status}">${booking.status}</div>
+                        <div class="booking-info">
+                            <h3>${booking.serviceType}</h3>
+                            <div class="booking-meta">
+                                <span><i class="far fa-calendar"></i> ${formatDate(booking.timestamp)}</span>
+                                <span><i class="fas fa-map-marker-alt"></i> ${booking.shopName}</span>
+                            </div>
+                        </div>
+                        <div class="status-badge status-${booking.status}">${booking.status}</div>
                     </div>
-                    <div class="booking-details">
-                        <div class="booking-detail">
-                            <span class="detail-label">Vehicle</span>
-                            <span class="detail-value">${booking.vehicleModel} (${booking.vehicleNumber})</span>
+                    <div class="booking-details-grid">
+                        <div class="detail-item">
+                            <label>Service Center</label>
+                            <span>${booking.shopName}</span>
                         </div>
-                        <div class="booking-detail">
-                            <span class="detail-label">Service Center</span>
-                            <span class="detail-value">${booking.shopName}</span>
+                        <div class="detail-item">
+                            <label>Vehicle</label>
+                            <span>${booking.vehicleModel} (${booking.vehicleNumber})</span>
                         </div>
-                        <div class="booking-detail">
-                            <span class="detail-label">Location</span>
-                            <span class="detail-value">${booking.location}</span>
+                        <div class="detail-item">
+                            <label>Location</label>
+                            <span>${booking.location}</span>
                         </div>
-                        <div class="booking-detail">
-                            <span class="detail-label">Date</span>
-                            <span class="detail-value">${formatDate(booking.timestamp)}</span>
+                         ${booking.finalCost ? `
+                        <div class="detail-item">
+                            <label>Service Cost</label>
+                            <span class="cost-value">${booking.finalCost}</span>
                         </div>
+                        ` : ''}
                     </div>
                     ${booking.status === 'pending' ? `
-                    <div class="booking-actions">
-                        <button class="action-btn" onclick="cancelBooking('${booking.id}')" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                    <div style="display: flex; justify-content: flex-end; margin-top: 0.5rem;">
+                        <button class="btn btn-outline" onclick="cancelBooking('${booking.id}')" style="color: var(--danger); border-color: var(--danger);">
                             Cancel Booking
                         </button>
                     </div>
@@ -1029,8 +952,11 @@
             const pendingBookings = userBookings.filter(booking => booking.status === 'pending' || booking.status === 'accepted');
             if (pendingBookings.length > 0) {
                 const nextBooking = pendingBookings[0];
-                document.getElementById('nextServiceDate').textContent = formatDate(nextBooking.timestamp);
+                document.getElementById('nextServiceDate').textContent = formatDate(nextBooking.timestamp).split(',')[0];
                 document.getElementById('nextServiceText').textContent = `${nextBooking.serviceType} at ${nextBooking.shopName}`;
+            } else {
+                document.getElementById('nextServiceDate').textContent = '--';
+                document.getElementById('nextServiceText').textContent = 'No upcoming services';
             }
         }
 
@@ -1136,7 +1062,7 @@
         }
 
         window.viewHistory = function() {
-            alert('Service History feature coming soon! You will be able to view all your past services.');
+            window.location.href = 'service-history.html';
         }
 
         window.editProfile = function() {

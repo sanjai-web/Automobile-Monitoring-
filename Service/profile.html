@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Settings - Vehicle Service Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0D9488;
+            --primary-dark: #0F766E;
+            --secondary: #2DD4BF;
+            --background: #F1F5F9;
+            --surface: #FFFFFF;
+            --text-main: #0F172A;
+            --text-light: #64748B;
+            --border: #E2E8F0;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --info: #3B82F6;
+            --sidebar-width: 260px;
+            --header-height: 64px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100%;
+            z-index: 50;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 1rem;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: #F0FDFA;
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            width: 1.25rem;
+            text-align: center;
+        }
+
+        .user-profile {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Header */
+        header {
+            height: var(--header-height);
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--background);
+            border-color: var(--text-light);
+        }
+
+        /* Content Area */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background-color: var(--surface);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .profile-avatar-large {
+            width: 6rem;
+            height: 6rem;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+
+        .profile-title h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-title p {
+            color: var(--text-light);
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            background-color: var(--background);
+            color: var(--text-main);
+            font-size: 1rem;
+        }
+
+        .form-control:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .header-title {
+                display: none;
+            }
+            
+            .content-scroll {
+                padding: 1rem;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="dashboard.html" class="logo">
+                <i class="fas fa-car-side"></i>
+                VehiclePro
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-item" onclick="window.location.href='dashboard.html'">
+                <i class="fas fa-th-large"></i>
+                Dashboard
+            </div>
+            <div class="nav-item" onclick="window.location.href='servicerequest.html'">
+                <i class="fas fa-clipboard-list"></i>
+                Service Requests
+            </div>
+            <div class="nav-item active">
+                <i class="fas fa-user-cog"></i>
+                Profile Settings
+            </div>
+        </nav>
+        <div class="user-profile">
+            <div class="avatar" id="userAvatar">S</div>
+            <div class="user-info">
+                <div class="user-name" id="userName">Service Provider</div>
+                <div class="user-role">Service Center</div>
+            </div>
+            <button class="btn-outline" onclick="logout()" style="border: none; padding: 0.5rem;">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header>
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="header-title">Profile Settings</div>
+            <div class="header-actions">
+                <button class="btn btn-outline" onclick="window.location.href='dashboard.html'">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </button>
+            </div>
+        </header>
+
+        <div class="content-scroll">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar-large" id="profileAvatarLarge">S</div>
+                    <div class="profile-title">
+                        <h2 id="profileName">Shop Name</h2>
+                        <p>Manage your service center information</p>
+                    </div>
+                </div>
+
+                <div class="profile-grid">
+                    <div class="section">
+                        <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Shop Information</h3>
+                        <div class="form-group">
+                            <label>Shop Name</label>
+                            <input type="text" class="form-control" id="shopName" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Owner Name</label>
+                            <input type="text" class="form-control" id="ownerName" disabled>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Contact & Location</h3>
+                        <div class="form-group">
+                            <label>Mobile Number</label>
+                            <input type="text" class="form-control" id="mobileNumber" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input type="text" class="form-control" id="location" disabled>
+                        </div>
+                    </div>
+                    
+                    <div class="section" style="grid-column: 1 / -1;">
+                        <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Services Offered</h3>
+                        <div class="form-group">
+                            <label>Service Types</label>
+                            <input type="text" class="form-control" id="serviceTypes" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+                    <button class="btn btn-primary" id="editBtn" onclick="toggleEdit()">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, update, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyASqz3ZFzKeJfZEPpNR2xNTFaN2xIAIo40",
+            authDomain: "vehicle-monitoring-9551e.firebaseapp.com",
+            databaseURL: "https://vehicle-monitoring-9551e-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "vehicle-monitoring-9551e",
+            storageBucket: "vehicle-monitoring-9551e.firebasestorage.app",
+            messagingSenderId: "321619066021",
+            appId: "1:321619066021:web:e7dd6e12882ab0467b214c",
+            measurementId: "G-V4EXKXP290"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Sidebar Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target) && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
+        let currentProviderData = null;
+        let isEditing = false;
+
+        // Check if user is logged in
+        window.addEventListener('DOMContentLoaded', () => {
+            // Note: In dashboard it was 'loggedInServiceProvider', here it was 'loggedInProvider'. 
+            // I should check which one is correct. 
+            // Service/dashboard.html uses 'loggedInServiceProvider'.
+            // I will support both just in case or stick to 'loggedInServiceProvider' if I can confirm.
+            // Let's use 'loggedInServiceProvider' as it's more likely correct based on dashboard.
+            let userSession = sessionStorage.getItem('loggedInServiceProvider');
+            
+            if (!userSession) {
+                // Fallback
+                userSession = sessionStorage.getItem('loggedInProvider');
+            }
+            
+            if (!userSession) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            currentProviderData = JSON.parse(userSession);
+            
+            // Update Sidebar
+            document.getElementById('userName').textContent = currentProviderData.shopName;
+            document.getElementById('userAvatar').textContent = currentProviderData.shopName.charAt(0).toUpperCase();
+
+            // Update Profile Content
+            document.getElementById('profileAvatarLarge').textContent = currentProviderData.shopName.charAt(0).toUpperCase();
+            document.getElementById('profileName').textContent = currentProviderData.shopName;
+            
+            document.getElementById('shopName').value = currentProviderData.shopName;
+            document.getElementById('ownerName').value = currentProviderData.ownerName || '';
+            document.getElementById('mobileNumber').value = currentProviderData.mobile;
+            document.getElementById('location').value = currentProviderData.placeName || currentProviderData.location || '';
+            
+            // Format service types
+            if (currentProviderData.serviceTypes && Array.isArray(currentProviderData.serviceTypes)) {
+                document.getElementById('serviceTypes').value = currentProviderData.serviceTypes.join(', ');
+            } else {
+                document.getElementById('serviceTypes').value = 'General Maintenance';
+            }
+        });
+
+        window.toggleEdit = function() {
+            const inputs = document.querySelectorAll('.form-control');
+            const editBtn = document.getElementById('editBtn');
+            
+            if (!isEditing) {
+                // Enable editing
+                inputs.forEach(input => input.disabled = false);
+                // Keep mobile number disabled as it's the ID
+                document.getElementById('mobileNumber').disabled = true;
+                
+                editBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                editBtn.classList.remove('btn-primary');
+                editBtn.classList.add('btn-success');
+                editBtn.style.backgroundColor = 'var(--success)';
+                isEditing = true;
+            } else {
+                // Save changes
+                saveProfile();
+            }
+        }
+
+        async function saveProfile() {
+            const newShopName = document.getElementById('shopName').value;
+            const newOwnerName = document.getElementById('ownerName').value;
+            const newLocation = document.getElementById('location').value;
+            const newServiceTypesStr = document.getElementById('serviceTypes').value;
+
+            if (!newShopName || !newLocation) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            try {
+                // Parse service types
+                const newServiceTypes = newServiceTypesStr.split(',').map(s => s.trim()).filter(s => s.length > 0);
+
+                // Find provider in DB
+                const providersRef = ref(database, 'serviceProviders');
+                const snapshot = await get(providersRef);
+                
+                if (snapshot.exists()) {
+                    const providers = snapshot.val();
+                    let providerKey = null;
+                    
+                    Object.keys(providers).forEach(key => {
+                        if (providers[key].mobile === currentProviderData.mobile) {
+                            providerKey = key;
+                        }
+                    });
+
+                    if (providerKey) {
+                        const updates = {
+                            shopName: newShopName,
+                            ownerName: newOwnerName,
+                            placeName: newLocation, // Assuming placeName is used for location display
+                            serviceTypes: newServiceTypes
+                        };
+                        
+                        await update(ref(database, `serviceProviders/${providerKey}`), updates);
+                        
+                        // Update Session
+                        currentProviderData.shopName = newShopName;
+                        currentProviderData.ownerName = newOwnerName;
+                        currentProviderData.placeName = newLocation;
+                        currentProviderData.location = newLocation; // Update both just in case
+                        currentProviderData.serviceTypes = newServiceTypes;
+                        
+                        sessionStorage.setItem('loggedInServiceProvider', JSON.stringify(currentProviderData));
+                        
+                        // Update UI
+                        document.getElementById('userName').textContent = newShopName;
+                        document.getElementById('profileName').textContent = newShopName;
+                        document.getElementById('userAvatar').textContent = newShopName.charAt(0).toUpperCase();
+                        document.getElementById('profileAvatarLarge').textContent = newShopName.charAt(0).toUpperCase();
+                        
+                        alert('Profile updated successfully!');
+                        
+                        // Reset UI state
+                        const inputs = document.querySelectorAll('.form-control');
+                        inputs.forEach(input => input.disabled = true);
+                        
+                        const editBtn = document.getElementById('editBtn');
+                        editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit Profile';
+                        editBtn.style.backgroundColor = ''; // Reset to default
+                        editBtn.classList.remove('btn-success');
+                        editBtn.classList.add('btn-primary');
+                        isEditing = false;
+                    } else {
+                        alert('Provider record not found in database.');
+                    }
+                }
+            } catch (error) {
+                console.error("Error updating profile:", error);
+                alert('Failed to update profile. Please try again.');
+            }
+        }
+
+        window.logout = function() {
+            sessionStorage.removeItem('loggedInServiceProvider');
+            sessionStorage.removeItem('loggedInProvider');
+            window.location.href = '../index.html';
+        }
+    </script>
+</body>
+</html>

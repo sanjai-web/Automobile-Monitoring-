@@ -4,230 +4,304 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Service Provider Dashboard - Vehicle Service Pro</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #0D9488;
+            --primary-dark: #0F766E;
+            --secondary: #2DD4BF;
+            --background: #F1F5F9;
+            --surface: #FFFFFF;
+            --text-main: #0F172A;
+            --text-light: #64748B;
+            --border: #E2E8F0;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --info: #3B82F6;
+            --sidebar-width: 260px;
+            --header-height: 64px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        :root {
-            --primary: #2877ff;
-            --secondary: #009dfe;
-            --accent: #43e97b;
-            --light: #f8f9fa;
-            --dark: #343a40;
-            --gray: #6c757d;
-            --warning: #ff9a3d;
-            --danger: #ff6b6b;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
-            min-height: 100vh;
-            color: var(--dark);
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
         }
 
-        /* Navigation Bar */
-        nav {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--surface);
+            border-right: 1px solid var(--border);
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            position: fixed;
+            height: 100%;
+            z-index: 50;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            height: var(--header-height);
+            display: flex;
             align-items: center;
+            padding: 0 1.5rem;
+            border-bottom: 1px solid var(--border);
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: white;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
             text-decoration: none;
         }
 
-        .logo svg {
-            width: 35px;
-            height: 35px;
+        .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 1rem;
+            overflow-y: auto;
         }
 
-        .nav-right {
+        .nav-item {
             display: flex;
             align-items: center;
-            gap: 2rem;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+            font-weight: 500;
+            cursor: pointer;
         }
 
-        .user-info {
+        .nav-item:hover, .nav-item.active {
+            background-color: #F0FDFA;
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            width: 1.25rem;
+            text-align: center;
+        }
+
+        .user-profile {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
+        }
+
+        .avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            background-color: var(--primary);
             color: white;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
             border-radius: 50%;
-            background: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--primary);
-            font-weight: bold;
-            font-size: 1.2rem;
+            font-weight: 600;
         }
 
-        .nav-buttons {
+        .user-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Header */
+        header {
+            height: var(--header-height);
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
             display: flex;
             gap: 1rem;
         }
 
-        .nav-btn {
-            padding: 0.6rem 1.5rem;
-            background: white;
-            color: var(--primary);
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .nav-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
         }
 
-        /* Main Content */
-        .dashboard-container {
-            max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 2rem;
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
         }
 
-        .welcome-section {
-            background: white;
-            border-radius: 15px;
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--background);
+            border-color: var(--text-light);
+        }
+
+        /* Dashboard Content */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
             padding: 2rem;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 1rem;
+            padding: 2rem;
+            color: white;
             margin-bottom: 2rem;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            animation: fadeIn 0.5s ease-out;
+            box-shadow: var(--shadow-md);
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .welcome-section h1 {
-            color: var(--dark);
-            font-size: 2rem;
+        .welcome-banner h1 {
+            font-size: 1.75rem;
             margin-bottom: 0.5rem;
         }
 
-        .welcome-section p {
-            color: var(--gray);
-            font-size: 1.1rem;
+        .welcome-banner p {
+            opacity: 0.9;
         }
 
-        /* Dashboard Grid */
-        .dashboard-grid {
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
-        .dashboard-card {
-            background: white;
-            border-radius: 15px;
+        .stat-card {
+            background-color: var(--surface);
             padding: 1.5rem;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
-            animation: fadeIn 0.5s ease-out;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
         }
 
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        .stat-info h3 {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
         }
 
-        .card-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .stat-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.75rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1rem;
+            font-size: 1.25rem;
         }
 
-        .card-icon.blue {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-        }
+        .bg-teal { background-color: #F0FDFA; color: var(--primary); }
+        .bg-orange { background-color: #FFFBEB; color: var(--warning); }
+        .bg-blue { background-color: #EFF6FF; color: var(--info); }
 
-        .card-icon.green {
-            background: linear-gradient(135deg, var(--accent) 0%, #38ef7d 100%);
-        }
-
-        .card-icon.orange {
-            background: linear-gradient(135deg, #ff9a3d 0%, #ff6b6b 100%);
-        }
-
-        .card-icon.purple {
-            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
-        }
-
-        .card-icon svg {
-            width: 28px;
-            height: 28px;
-            color: white;
-        }
-
-        .card-title {
-            color: var(--gray);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .card-value {
-            color: var(--dark);
-            font-size: 1.8rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
-        .card-subtitle {
-            color: var(--gray);
-            font-size: 0.85rem;
-        }
-
-        /* Main Content Layout */
+        /* Content Layout */
         .content-layout {
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 1.5rem;
-            margin-bottom: 2rem;
         }
 
-        /* Service Requests Section */
-        .service-requests {
-            background: white;
-            border-radius: 15px;
+        /* Requests List */
+        .requests-section {
+            background-color: var(--surface);
+            border-radius: 1rem;
             padding: 1.5rem;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            animation: fadeIn 0.5s ease-out;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
         }
 
         .section-header {
@@ -238,19 +312,8 @@
         }
 
         .section-header h2 {
-            color: var(--dark);
-            font-size: 1.5rem;
-        }
-
-        .view-all {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-
-        .view-all:hover {
-            text-decoration: underline;
+            font-size: 1.25rem;
+            font-weight: 600;
         }
 
         .requests-list {
@@ -259,446 +322,292 @@
             gap: 1rem;
         }
 
-        .request-item {
+        .request-card {
+            background-color: var(--background);
+            border-radius: 0.75rem;
+            padding: 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem;
-            border-radius: 10px;
-            background: #f8f9fa;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
-        .request-item:hover {
-            background: #e9ecef;
+        .request-card:hover {
+            background-color: #E2E8F0;
         }
 
         .request-info h4 {
-            color: var(--dark);
-            margin-bottom: 0.3rem;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
         }
 
-        .request-info p {
-            color: var(--gray);
-            font-size: 0.9rem;
+        .request-meta {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
         }
 
-        .request-status {
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 500;
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
-        .status-pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-confirmed {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        .status-completed {
-            background: #d4edda;
-            color: #155724;
-        }
+        .status-pending { background-color: #FFFBEB; color: var(--warning); }
+        .status-accepted { background-color: #EFF6FF; color: var(--info); }
+        .status-completed { background-color: #ECFDF5; color: var(--success); }
+        .status-cancelled { background-color: #FEF2F2; color: var(--danger); }
 
         .request-actions {
             display: flex;
             gap: 0.5rem;
         }
 
-        .action-btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 6px;
+        .action-btn-sm {
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.375rem;
             font-size: 0.8rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
+            border: none;
+            transition: all 0.2s;
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
+        .btn-accept { background-color: var(--success); color: white; }
+        .btn-decline { background-color: transparent; border: 1px solid var(--danger); color: var(--danger); }
+        .btn-complete { background-color: var(--primary); color: white; }
+        .btn-details { background-color: transparent; border: 1px solid var(--text-light); color: var(--text-light); }
 
-        .btn-primary:hover {
-            background: #3d9de8;
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--primary);
-            border: 1px solid var(--primary);
-        }
-
-        .btn-outline:hover {
-            background: rgba(79, 172, 254, 0.1);
-        }
-
-        /* Right Sidebar */
-        .sidebar {
+        /* Right Sidebar Info */
+        .info-sidebar {
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
         }
 
-        /* Shop Info Section */
-        .shop-info {
-            background: white;
-            border-radius: 15px;
+        .info-card {
+            background-color: var(--surface);
+            border-radius: 1rem;
             padding: 1.5rem;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            animation: fadeIn 0.5s ease-out;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
         }
 
-        .info-item {
+        .info-row {
             display: flex;
             justify-content: space-between;
-            padding: 1rem 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .info-item:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            color: var(--gray);
-            font-weight: 500;
-        }
-
-        .info-value {
-            color: var(--dark);
-            font-weight: 600;
-        }
-
-        /* Quick Stats Section */
-        .quick-stats {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .stats-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.8rem 0;
-        }
-
-        .stats-label {
-            color: var(--gray);
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
             font-size: 0.9rem;
         }
 
-        .stats-value {
-            color: var(--dark);
-            font-weight: 600;
+        .info-row:last-child {
+            border-bottom: none;
         }
 
-        /* Charts Section */
-        .charts-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+        .info-label { color: var(--text-light); }
+        .info-val { font-weight: 600; color: var(--text-main); }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
         }
 
-        .chart-card {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .chart-title {
-            font-size: 1.2rem;
-            color: var(--dark);
-            font-weight: 600;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 250px;
-            width: 100%;
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .action-btn-large {
-            padding: 1rem;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .action-btn-large:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
-        }
-
-        .action-btn-large.outline {
-            background: white;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-        }
-
-        .action-btn-large.outline:hover {
-            background: #f8f9fa;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1200px) {
+        /* Responsive */
+        @media (max-width: 1024px) {
             .content-layout {
-                grid-template-columns: 1fr;
-            }
-            
-            .charts-section {
                 grid-template-columns: 1fr;
             }
         }
 
         @media (max-width: 768px) {
-            nav {
-                padding: 1rem;
+            .sidebar {
+                transform: translateX(-100%);
             }
 
-            .logo {
-                font-size: 1.2rem;
+            .sidebar.active {
+                transform: translateX(0);
             }
 
-            .nav-right {
-                gap: 1rem;
+            .main-content {
+                margin-left: 0;
             }
 
-            .user-info span {
+            .menu-toggle {
+                display: block;
+            }
+
+            .header-title {
                 display: none;
             }
-
-            .dashboard-container {
-                padding: 0 1rem;
+            
+            .content-scroll {
+                padding: 1rem;
             }
-
-            .welcome-section h1 {
-                font-size: 1.5rem;
-            }
-
-            .dashboard-grid {
+            
+            .stats-grid {
                 grid-template-columns: 1fr;
             }
 
-            .nav-buttons {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .request-item {
+            .request-card {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 1rem;
-            }
-
-            .request-actions {
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            .action-buttons {
-                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav>
-        <a href="index.html" class="logo">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
-            </svg>
-            Vehicle Service Pro
-        </a>
-        <div class="nav-right">
-            <div class="user-info">
-                <div class="user-avatar" id="userAvatar">S</div>
-                <span id="userName">Service Provider</span>
-            </div>
-            <div class="nav-buttons">
-                <button class="nav-btn" onclick="viewServiceRequests()">Service Requests</button>
-                <button class="nav-btn" onclick="logout()">Logout</button>
-            </div>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="logo">
+                <i class="fas fa-tools"></i>
+                VehiclePro
+            </a>
         </div>
-    </nav>
+        <nav class="sidebar-nav">
+            <div class="nav-item active">
+                <i class="fas fa-th-large"></i>
+                Dashboard
+            </div>
+            <div class="nav-item" onclick="window.location.href='servicerequest.html'">
+                <i class="fas fa-clipboard-list"></i>
+                Service Requests
+            </div>
+            <div class="nav-item" onclick="window.location.href='profile.html'">
+                <i class="fas fa-user-cog"></i>
+                Profile Settings
+            </div>
+        </nav>
+        <div class="user-profile">
+            <div class="avatar" id="userAvatar">S</div>
+            <div class="user-info">
+                <div class="user-name" id="userName">Provider</div>
+                <div class="user-role">Service Partner</div>
+            </div>
+            <button class="btn-outline" onclick="logout()" style="border: none; padding: 0.5rem;">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </aside>
 
     <!-- Main Content -->
-    <div class="dashboard-container">
-        <!-- Welcome Section -->
-        <div class="welcome-section">
-            <h1>Welcome back, <span id="shopName">Service Provider</span>!</h1>
-            <p>Here's an overview of your service center activities</p>
-        </div>
-
-        <!-- Dashboard Cards -->
-        <div class="dashboard-grid">
-            <div class="dashboard-card">
-                <div class="card-icon blue">
-                    <i class="fas fa-tools"></i>
-                </div>
-                <div class="card-title">Total Services</div>
-                <div class="card-value" id="totalServices">0</div>
-                <div class="card-subtitle">This month</div>
-            </div>
-
-            <div class="dashboard-card">
-                <div class="card-icon green">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <div class="card-title">Pending Requests</div>
-                <div class="card-value" id="pendingRequests">0</div>
-                <div class="card-subtitle">Awaiting confirmation</div>
-            </div>
-
-            <div class="dashboard-card">
-                <div class="card-icon purple">
-                    <i class="fas fa-dollar-sign"></i>
-                </div>
-                <div class="card-title">Revenue</div>
-                <div class="card-value" id="revenue">₹0</div>
-                <div class="card-subtitle">This month</div>
-            </div>
-        </div>
-
-        <!-- Main Content Layout -->
-        <div class="content-layout">
-            <!-- Service Requests Section -->
-            <div class="service-requests">
-                <div class="section-header">
-                    <h2>Recent Service Requests</h2>
-                    <a href="./servicerequest.html" class="view-all">View All</a>
-                </div>
-                <div class="requests-list" id="requestsList">
-                    <!-- Service requests will be dynamically inserted here -->
-                    <div class="empty-state" id="emptyRequests">
-                        <p>No service requests available.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Sidebar -->
-            <div class="sidebar">
-                <!-- Shop Info Section -->
-                <div class="shop-info">
-                    <h2 style="margin-bottom: 1.5rem;">Shop Information</h2>
-                    <div class="info-item">
-                        <span class="info-label">Shop Name</span>
-                        <span class="info-value" id="infoShopName">--</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Mobile Number</span>
-                        <span class="info-value" id="infoMobile">--</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Location</span>
-                        <span class="info-value" id="infoLocation">--</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Place Name</span>
-                        <span class="info-value" id="infoPlace">--</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Member Since</span>
-                        <span class="info-value" id="infoMemberSince">--</span>
-                    </div>
-                </div>
-
-                <!-- Quick Stats Section -->
-                <div class="quick-stats">
-                    <h2 style="margin-bottom: 1.5rem;">Quick Stats</h2>
-                    <div class="stats-item">
-                        <span class="stats-label">Services Today</span>
-                        <span class="stats-value" id="servicesToday">0</span>
-                    </div>
-                    <div class="stats-item">
-                        <span class="stats-label">Completion Rate</span>
-                        <span class="stats-value" id="completionRate">0%</span>
-                    </div>
-                    <div class="stats-item">
-                        <span class="stats-label">Avg. Response Time</span>
-                        <span class="stats-value" id="avgResponseTime">0 min</span>
-                    </div>
-                    <div class="stats-item">
-                        <span class="stats-label">Customer Satisfaction</span>
-                        <span class="stats-value" id="customerSatisfaction">0%</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Section -->
-        <div class="charts-section">
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3 class="chart-title">Services Overview</h3>
-                </div>
-                <div class="chart-container">
-                    <canvas id="servicesChart"></canvas>
-                </div>
-            </div>
-
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3 class="chart-title">Revenue Trend</h3>
-                </div>
-                <div class="chart-container">
-                    <canvas id="revenueChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-            <button class="action-btn-large" onclick="manageServices()">
-                <i class="fas fa-cogs"></i> Manage Services
+    <main class="main-content">
+        <header>
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
             </button>
-            <button class="action-btn-large" onclick="updateAvailability()">
-                <i class="fas fa-calendar-alt"></i> Update Availability
-            </button>
-            <button class="action-btn-large outline" onclick="editProfile()">
-                <i class="fas fa-user-edit"></i> Edit Profile
-            </button>
+            <div class="header-title">Partner Dashboard</div>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="updateAvailability()">
+                    <i class="fas fa-clock"></i>
+                    <span style="display: none;">Update Availability</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="content-scroll">
+            <div class="welcome-banner">
+                <h1>Welcome back, <span id="shopName">Partner</span>!</h1>
+                <p>Manage your service center operations efficiently.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Total Services</h3>
+                        <div class="stat-value" id="totalServices">0</div>
+                        <div style="font-size: 0.8rem; color: var(--text-light);">This Month</div>
+                    </div>
+                    <div class="stat-icon bg-teal">
+                        <i class="fas fa-wrench"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Pending Requests</h3>
+                        <div class="stat-value" id="pendingRequests">0</div>
+                        <div style="font-size: 0.8rem; color: var(--text-light);">Action Required</div>
+                    </div>
+                    <div class="stat-icon bg-orange">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Completion Rate</h3>
+                        <div class="stat-value" id="completionRate">0%</div>
+                        <div style="font-size: 0.8rem; color: var(--text-light);">Performance</div>
+                    </div>
+                    <div class="stat-icon bg-blue">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-layout">
+                <!-- Service Requests -->
+                <div class="requests-section">
+                    <div class="section-header">
+                        <h2>Recent Requests</h2>
+                        <button class="btn btn-outline" onclick="viewServiceRequests()">View All</button>
+                    </div>
+                    <div class="requests-list" id="requestsList">
+                        <!-- Requests populated here -->
+                        <div class="empty-state" id="emptyRequests">
+                            <p>No service requests available.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar Info -->
+                <div class="info-sidebar">
+                    <div class="info-card">
+                        <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">Shop Details</h2>
+                        <div class="info-row">
+                            <span class="info-label">Name</span>
+                            <span class="info-val" id="infoShopName">--</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Mobile</span>
+                            <span class="info-val" id="infoMobile">--</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Location</span>
+                            <span class="info-val" id="infoLocation">--</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">City</span>
+                            <span class="info-val" id="infoPlace">--</span>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">Quick Stats</h2>
+                        <div class="info-row">
+                            <span class="info-label">Today's Services</span>
+                            <span class="info-val" id="servicesToday">0</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Avg Response</span>
+                            <span class="info-val" id="avgResponseTime">--</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Satisfaction</span>
+                            <span class="info-val" id="customerSatisfaction">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </main>
 
     <!-- Firebase SDK -->
     <script type="module">
@@ -723,6 +632,22 @@
         let serviceRequests = [];
         let currentProvider = null;
 
+        // Sidebar Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target) && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
         // Check if service provider is logged in
         window.addEventListener('DOMContentLoaded', () => {
             const providerSession = sessionStorage.getItem('loggedInServiceProvider');
@@ -744,13 +669,9 @@
             document.getElementById('infoMobile').textContent = providerData.mobile;
             document.getElementById('infoLocation').textContent = providerData.plusCode;
             document.getElementById('infoPlace').textContent = providerData.placeName;
-            document.getElementById('infoMemberSince').textContent = 'Today';
 
             // Load service requests for this provider
             loadServiceRequests(providerData.mobile);
-            
-            // Initialize charts
-            initializeCharts();
         });
 
         // Load service requests for this provider
@@ -778,7 +699,6 @@
         // Render service requests in the UI
         function renderServiceRequests() {
             const container = document.getElementById('requestsList');
-            const emptyState = document.getElementById('emptyRequests');
             
             if (serviceRequests.length === 0) {
                 container.innerHTML = `
@@ -792,19 +712,26 @@
             // Sort requests by timestamp (newest first)
             serviceRequests.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
             
-            // Show only the 3 most recent requests
-            const recentRequests = serviceRequests.slice(0, 3);
+            // Show only the 5 most recent requests
+            const recentRequests = serviceRequests.slice(0, 5);
             
             container.innerHTML = recentRequests.map(request => `
-                <div class="request-item">
+                <div class="request-card">
                     <div class="request-info">
-                        <h4>${request.serviceType} - ${request.vehicleModel}</h4>
-                        <p>${request.vehicleNumber} • ${request.ownerName}</p>
-                        <p><i class="fas fa-clock"></i> Requested: ${formatDate(request.timestamp)}</p>
+                        <h4>${request.serviceType}</h4>
+                        <div class="request-meta">
+                            <span><i class="fas fa-car"></i> ${request.vehicleModel} (${request.vehicleNumber})</span>
+                            <span><i class="fas fa-user"></i> ${request.ownerName}</span>
+                        </div>
+                        <div class="request-meta" style="margin-top: 0.25rem;">
+                            <span><i class="far fa-clock"></i> ${formatDate(request.timestamp)}</span>
+                        </div>
                     </div>
-                    <div class="request-status status-${request.status}">${getStatusText(request.status)}</div>
-                    <div class="request-actions">
-                        ${getActionButtons(request.status, request.id)}
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;">
+                        <div class="status-badge status-${request.status}">${getStatusText(request.status)}</div>
+                        <div class="request-actions">
+                            ${getActionButtons(request.status, request.id)}
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -826,20 +753,20 @@
             switch(status) {
                 case 'pending':
                     return `
-                        <button class="action-btn btn-primary" onclick="acceptRequest('${requestId}')">Accept</button>
-                        <button class="action-btn btn-outline" onclick="declineRequest('${requestId}')">Decline</button>
+                        <button class="action-btn-sm btn-accept" onclick="acceptRequest('${requestId}')">Accept</button>
+                        <button class="action-btn-sm btn-decline" onclick="declineRequest('${requestId}')">Decline</button>
                     `;
                 case 'accepted':
                     return `
-                        <button class="action-btn btn-primary" onclick="completeRequest('${requestId}')">Complete</button>
+                        <button class="action-btn-sm btn-complete" onclick="completeRequest('${requestId}')">Complete</button>
                     `;
                 case 'completed':
                     return `
-                        <button class="action-btn btn-outline" onclick="viewDetails('${requestId}')">Details</button>
+                        <button class="action-btn-sm btn-details" onclick="viewDetails('${requestId}')">Details</button>
                     `;
                 default:
                     return `
-                        <button class="action-btn btn-outline" onclick="viewDetails('${requestId}')">Details</button>
+                        <button class="action-btn-sm btn-details" onclick="viewDetails('${requestId}')">Details</button>
                     `;
             }
         }
@@ -848,7 +775,6 @@
         function formatDate(dateString) {
             const date = new Date(dateString);
             return date.toLocaleDateString('en-US', { 
-                year: 'numeric', 
                 month: 'short', 
                 day: 'numeric',
                 hour: '2-digit',
@@ -873,17 +799,6 @@
             const pendingCount = serviceRequests.filter(request => request.status === 'pending').length;
             document.getElementById('pendingRequests').textContent = pendingCount;
             
-            // Revenue (estimated based on service type)
-            let revenue = 0;
-            serviceRequests.forEach(request => {
-                if (request.status === 'completed' && 
-                    new Date(request.timestamp).getMonth() === currentMonth &&
-                    new Date(request.timestamp).getFullYear() === currentYear) {
-                    revenue += estimateServiceCost(request.serviceType);
-                }
-            });
-            document.getElementById('revenue').textContent = `₹${revenue.toLocaleString()}`;
-            
             // Services today
             const today = new Date().toDateString();
             const todayServices = serviceRequests.filter(request => {
@@ -903,87 +818,6 @@
             
             // Customer satisfaction (simulated)
             document.getElementById('customerSatisfaction').textContent = '94%';
-        }
-
-        // Estimate service cost based on service type
-        function estimateServiceCost(serviceType) {
-            const costMap = {
-                'Oil Change': 1200,
-                'ABS Brakes': 3500,
-                'Transmission': 4500,
-                'Tires & Wheels': 800,
-                'Engine Tuning': 2500,
-                'General Maintenance': 2800
-            };
-            return costMap[serviceType] || 1500;
-        }
-
-        // Initialize Charts
-        function initializeCharts() {
-            // Services Overview Chart
-            const servicesCtx = document.getElementById('servicesChart').getContext('2d');
-            new Chart(servicesCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Oil Change', 'Brake Service', 'Tire Rotation', 'Engine Tune', 'AC Service', 'General'],
-                    datasets: [{
-                        label: 'Services Completed',
-                        data: [12, 8, 6, 4, 9, 7],
-                        backgroundColor: [
-                            '#4facfe',
-                            '#00f2fe',
-                            '#43e97b',
-                            '#ff9a3d',
-                            '#a18cd1',
-                            '#ff6b6b'
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Number of Services'
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Revenue Trend Chart
-            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-            new Chart(revenueCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-                    datasets: [{
-                        label: 'Monthly Revenue (₹)',
-                        data: [32000, 35000, 38000, 42000, 39000, 45000, 48000],
-                        borderColor: '#4facfe',
-                        backgroundColor: 'rgba(79, 172, 254, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Revenue (₹)'
-                            }
-                        }
-                    }
-                }
-            });
         }
 
         // Navigation functions
