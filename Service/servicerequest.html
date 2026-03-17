@@ -612,6 +612,18 @@
                         </select>
                     </div>
                     <div class="filter-group">
+                        <label class="filter-label">Service Type</label>
+                        <select class="filter-control" id="serviceTypeFilter" onchange="filterRequests()">
+                            <option value="all">All Services</option>
+                            <option value="Oil Change">Oil Change</option>
+                            <option value="General Maintenance">General Maintenance</option>
+                            <option value="Tires & Wheels">Tires & Wheels</option>
+                            <option value="Engine Tuning">Engine Tuning</option>
+                            <option value="Transmission">Transmission</option>
+                            <option value="ABS Brakes">ABS Brakes</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
                         <label class="filter-label">Search</label>
                         <input type="text" class="filter-control" id="searchFilter" placeholder="Customer, vehicle..." onkeyup="filterRequests()">
                     </div>
@@ -909,7 +921,7 @@
         // Filter requests based on selected filters
         window.filterRequests = function() {
             const statusFilter = document.getElementById('statusFilter').value;
-            const serviceTypeFilter = document.getElementById('serviceTypeFilter').value || 'all';
+            const serviceTypeFilter = document.getElementById('serviceTypeFilter').value;
             const dateFilter = document.getElementById('dateFilter').value;
             const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
             

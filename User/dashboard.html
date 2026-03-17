@@ -662,7 +662,7 @@
                 </div>
                 <div class="service-card" onclick="openBookingModal('Tires & Wheels')">
                     <div class="service-icon">
-                        <i class="fas fa-tire"></i>
+                        <i class="fas fa-compact-disc"></i>
                     </div>
                     <h3>Tires & Wheels</h3>
                     <p>Rotation, alignment, and repair.</p>
@@ -946,14 +946,53 @@
 
         // Update dashboard statistics
         function updateDashboardStats() {
-            const totalServices = userBookings.filter(booking => booking.status === 'completed').length;
-            document.getElementById('totalServices').textContent = totalServices;
+            const completedBookings = userBookings.filter(booking => booking.status === 'completed')
+                .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
             
-            const pendingBookings = userBookings.filter(booking => booking.status === 'pending' || booking.status === 'accepted');
+            document.getElementById('totalServices').textContent = completedBookings.length;
+            
+            const pendingBookings = userBookings.filter(booking => booking.status === 'pending' || booking.status === 'accepted')
+                .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
             if (pendingBookings.length > 0) {
                 const nextBooking = pendingBookings[0];
                 document.getElementById('nextServiceDate').textContent = formatDate(nextBooking.timestamp).split(',')[0];
                 document.getElementById('nextServiceText').textContent = `${nextBooking.serviceType} at ${nextBooking.shopName}`;
+            } else if (completedBookings.length > 0) {
+                // Predictive next service logic
+                const latest = completedBookings[completedBookings.length - 1];
+                const lastDate = new Date(latest.timestamp);
+                const today = new Date();
+                
+                let nextDate;
+                let intervalMs;
+
+                if (completedBookings.length > 1) {
+                    let totalDiff = 0;
+                    for (let i = 1; i < completedBookings.length; i++) {
+                        totalDiff += (new Date(completedBookings[i].timestamp) - new Date(completedBookings[i-1].timestamp));
+                    }
+                    intervalMs = totalDiff / (completedBookings.length - 1);
+                    
+                    // Ensure minimum interval of 30 days to avoid same-day "next" service
+                    const minInterval = 30 * 24 * 60 * 60 * 1000;
+                    if (intervalMs < minInterval) intervalMs = 90 * 24 * 60 * 60 * 1000; // Default to 90 days if too small
+                    
+                    nextDate = new Date(lastDate.getTime() + intervalMs);
+                } else {
+                    // Default to 3 months if only one service exists
+                    nextDate = new Date(lastDate);
+                    nextDate.setMonth(nextDate.getMonth() + 3);
+                    intervalMs = nextDate - lastDate;
+                }
+
+                // If predicted date is in the past, keep adding interval until it's in the future
+                while (nextDate < today) {
+                    nextDate = new Date(nextDate.getTime() + (intervalMs || 90 * 24 * 60 * 60 * 1000));
+                }
+                
+                document.getElementById('nextServiceDate').textContent = nextDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+                document.getElementById('nextServiceText').textContent = 'Predicted based on history';
             } else {
                 document.getElementById('nextServiceDate').textContent = '--';
                 document.getElementById('nextServiceText').textContent = 'No upcoming services';

@@ -583,7 +583,7 @@
                 <div class="rec-list">
                     <div class="rec-item">
                         <div class="rec-icon bg-warning">
-                            <i class="fas fa-tire"></i>
+                            <i class="fas fa-compact-disc"></i>
                         </div>
                         <div class="rec-content">
                             <h4>Tire Rotation & Balancing</h4>
@@ -629,7 +629,33 @@
         </div>
     </main>
 
-    <script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyASqz3ZFzKeJfZEPpNR2xNTFaN2xIAIo40",
+            authDomain: "vehicle-monitoring-9551e.firebaseapp.com",
+            databaseURL: "https://vehicle-monitoring-9551e-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "vehicle-monitoring-9551e",
+            storageBucket: "vehicle-monitoring-9551e.firebasestorage.app",
+            messagingSenderId: "321619066021",
+            appId: "1:321619066021:web:e7dd6e12882ab0467b214c",
+            measurementId: "G-V4EXKXP290"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        
+        // Global chart instances for updating
+        let engineChart, tireChart, brakeChart, batteryChart;
+        let globalHealth = {
+            engine: 100,
+            tires: 100,
+            brakes: 100,
+            battery: 100
+        };
         // Sidebar Toggle
         const menuToggle = document.getElementById('menuToggle');
         const sidebar = document.getElementById('sidebar');
@@ -656,28 +682,208 @@
             }
 
             const userData = JSON.parse(userSession);
+            const vehicleNo = userData.vehicleNo;
             
             // Update UI with user data
             document.getElementById('userName').textContent = userData.username;
             document.getElementById('userAvatar').textContent = userData.username.charAt(0).toUpperCase();
-            document.getElementById('vehicleNumber').textContent = userData.vehicleNo;
+            document.getElementById('vehicleNumber').textContent = vehicleNo;
             
-            // Set sample vehicle data
+            // Set static vehicle data (could be move to DB later)
             document.getElementById('vehicleModel').textContent = 'Toyota Camry';
             document.getElementById('vehicleYear').textContent = '2020';
-            document.getElementById('lastService').textContent = '15 Aug 2023';
-            document.getElementById('nextService').textContent = '15 Nov 2023';
-            document.getElementById('odometer').textContent = '45,230 km';
 
-            // Initialize charts
+            // Initialize empty charts
             initializeCharts();
+
+            // Listen to Vehicle Stats
+            const statsRef = ref(database, `vehicle_stats/${vehicleNo}`);
+            onValue(statsRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    updateVehicleStatsUI(data);
+                }
+            });
+
+            // Calculate Service Dates
+            const bookingsRef = ref(database, 'bookings');
+            onValue(bookingsRef, (snapshot) => {
+                const bookings = snapshot.val();
+                if (bookings) {
+                    calculateServiceDates(bookings, vehicleNo);
+                }
+            });
         });
+
+        function updateVehicleStatsUI(data) {
+            // Update Odometer
+            if (data.odometer) {
+                document.getElementById('odometer').textContent = `${data.odometer.toLocaleString()} km`;
+            }
+
+            // Update Engine Health
+            if (data.oil_health) {
+                globalHealth.engine = data.oil_health.oil_health_score || 80;
+                updateEngineUI(globalHealth.engine);
+            }
+
+            // Update Tires Health
+            if (data.tire_health) {
+                globalHealth.tires = data.tire_health.overall_score || 75;
+                updateTiresUI(data.tire_health);
+            }
+
+            // Update Brakes Health
+            if (data.brake_health) {
+                globalHealth.brakes = data.brake_health.overall_score || 85;
+                updateBrakesUI(data.brake_health);
+            }
+
+            // Update Battery Health
+            if (data.battery_health) {
+                globalHealth.battery = data.battery_health.overall_score || 90;
+                updateBatteryUI(data.battery_health);
+            }
+
+            calculateAggregateHealth();
+        }
+
+        function updateEngineUI(score) {
+            if (!engineChart) return;
+            let chartData;
+            if (score > 85) chartData = [score, 100-score, 0, 0];
+            else if (score > 60) chartData = [0, score, 100-score, 0];
+            else chartData = [0, 0, score, 100-score];
+            
+            engineChart.data.datasets[0].data = chartData;
+            engineChart.update();
+            
+            const badge = document.querySelector('#engineChart').closest('.chart-card').querySelector('.status-badge');
+            updateBadge(badge, score);
+        }
+
+        function updateTiresUI(data) {
+            if (!tireChart) return;
+            // Assuming data.pressures = [FL, FR, RL, RR]
+            const pressures = data.pressures || [4.2, 4.5, 6.1, 6.3];
+            tireChart.data.datasets[0].data = pressures;
+            tireChart.update();
+            
+            const badge = document.querySelector('#tireChart').closest('.chart-card').querySelector('.status-badge');
+            updateBadge(badge, data.overall_score || 75);
+        }
+
+        function updateBrakesUI(data) {
+            if (!brakeChart) return;
+            const values = data.values || [85, 90, 75, 95, 80];
+            brakeChart.data.datasets[0].data = values;
+            brakeChart.update();
+            
+            const badge = document.querySelector('#brakeChart').closest('.chart-card').querySelector('.status-badge');
+            updateBadge(badge, data.overall_score || 85);
+        }
+
+        function updateBatteryUI(data) {
+            if (!batteryChart) return;
+            const history = data.history || [85, 80, 75, 70, 55];
+            batteryChart.data.datasets[0].data = history;
+            batteryChart.update();
+            
+            const badge = document.querySelector('#batteryChart').closest('.chart-card').querySelector('.status-badge');
+            updateBadge(badge, data.overall_score || 90);
+        }
+
+        function updateBadge(badge, score) {
+            if (!badge) return;
+            if (score < 40) {
+                badge.textContent = 'Critical';
+                badge.className = 'status-badge status-critical';
+            } else if (score < 70) {
+                badge.textContent = 'Attention';
+                badge.className = 'status-badge status-warning';
+            } else {
+                badge.textContent = 'Good';
+                badge.className = 'status-badge status-good';
+            }
+        }
+
+        function calculateAggregateHealth() {
+            // Weighted logic: Engine 40%, Brakes 25%, Tires 20%, Battery 15%
+            const aggregateScore = Math.round(
+                (globalHealth.engine * 0.4) + 
+                (globalHealth.brakes * 0.25) + 
+                (globalHealth.tires * 0.2) + 
+                (globalHealth.battery * 0.15)
+            );
+
+            document.getElementById('healthScore').textContent = `${aggregateScore}%`;
+
+            const summaryTitle = document.querySelector('.health-info h1');
+            const summaryText = document.querySelector('.health-info p');
+
+            if (aggregateScore >= 90) {
+                summaryText.textContent = "Your vehicle is in perfect condition.";
+            } else if (aggregateScore >= 75) {
+                summaryText.textContent = "Your vehicle is in good condition overall.";
+            } else if (aggregateScore >= 50) {
+                summaryText.textContent = "Your vehicle is in fair condition. Consider a checkup soon.";
+            } else if (aggregateScore >= 30) {
+                summaryText.textContent = "Your vehicle requires maintenance soon to avoid issues.";
+            } else {
+                summaryText.textContent = "Urgent: Vehicle health is critical. Please book a service immediately.";
+                summaryTitle.style.color = 'var(--danger)';
+            }
+        }
+
+        function calculateServiceDates(bookings, vehicleNo) {
+            const myBookings = Object.values(bookings)
+                .filter(b => b.vehicleNumber === vehicleNo && b.status === 'completed')
+                .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+            if (myBookings.length > 0) {
+                const latest = myBookings[myBookings.length - 1];
+                const lastDate = new Date(latest.timestamp);
+                const today = new Date();
+                document.getElementById('lastService').textContent = lastDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+
+                let nextDate;
+                let intervalMs;
+
+                if (myBookings.length > 1) {
+                    // Calculate average interval in days
+                    let totalDiff = 0;
+                    for (let i = 1; i < myBookings.length; i++) {
+                        const d1 = new Date(myBookings[i-1].timestamp);
+                        const d2 = new Date(myBookings[i].timestamp);
+                        totalDiff += (d2 - d1);
+                    }
+                    intervalMs = totalDiff / (myBookings.length - 1);
+                    
+                    // Enforce minimum 30 day interval
+                    if (intervalMs < 30 * 24 * 60 * 60 * 1000) intervalMs = 90 * 24 * 60 * 60 * 1000;
+                    
+                    nextDate = new Date(lastDate.getTime() + intervalMs);
+                } else {
+                    // Default to 3 months if only one service exists
+                    nextDate = new Date(lastDate);
+                    nextDate.setMonth(nextDate.getMonth() + 3);
+                    intervalMs = nextDate - lastDate;
+                }
+
+                // Ensure future date
+                while (nextDate < today) {
+                    nextDate = new Date(nextDate.getTime() + (intervalMs || 90 * 24 * 60 * 60 * 1000));
+                }
+
+                document.getElementById('nextService').textContent = nextDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+            }
+        }
 
         // Initialize Charts
         function initializeCharts() {
             // Engine Health Chart
             const engineCtx = document.getElementById('engineChart').getContext('2d');
-            new Chart(engineCtx, {
+            engineChart = new Chart(engineCtx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Excellent', 'Good', 'Fair', 'Poor'],
@@ -705,7 +911,7 @@
 
             // Tire Condition Chart
             const tireCtx = document.getElementById('tireChart').getContext('2d');
-            new Chart(tireCtx, {
+            tireChart = new Chart(tireCtx, {
                 type: 'bar',
                 data: {
                     labels: ['FL', 'FR', 'RL', 'RR'],
@@ -735,7 +941,7 @@
 
             // Brake System Chart
             const brakeCtx = document.getElementById('brakeChart').getContext('2d');
-            new Chart(brakeCtx, {
+            brakeChart = new Chart(brakeCtx, {
                 type: 'radar',
                 data: {
                     labels: ['Front', 'Rear', 'Fluid', 'ABS', 'Parking'],
@@ -764,13 +970,13 @@
 
             // Battery Health Chart
             const batteryCtx = document.getElementById('batteryChart').getContext('2d');
-            new Chart(batteryCtx, {
+            batteryChart = new Chart(batteryCtx, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    labels: ['Nov', 'Dec', 'Jan', 'Feb', 'Mar'],
                     datasets: [{
                         label: 'Health (%)',
-                        data: [85, 80, 75, 70, 55, 32],
+                        data: [85, 80, 75, 70, 55],
                         borderColor: '#EF4444',
                         backgroundColor: 'rgba(239, 68, 68, 0.1)',
                         tension: 0.4,
